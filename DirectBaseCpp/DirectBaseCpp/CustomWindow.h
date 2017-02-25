@@ -6,6 +6,7 @@
 
 class CustomWindow
 {
+	const LPCWSTR windowClassName = L"MyWindowClass";
 	FrameCounter* _frameCounter;
 	Renderer* _renderer;
 	HWND _windowHandle;

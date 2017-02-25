@@ -22,7 +22,7 @@ void CustomWindow::RegisteWindow(HINSTANCE hInstance)
 	wndClassExx.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	wndClassExx.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wndClassExx.lpszMenuName = nullptr;
-	wndClassExx.lpszClassName = L"TutorialWindowClass";
+	wndClassExx.lpszClassName = windowClassName;
 	wndClassExx.hIconSm = nullptr;
 	if (!RegisterClassEx(&wndClassExx))
 		throw new Exception();
@@ -56,13 +56,13 @@ LRESULT CustomWindow::EventProcessor(HWND hWnd, UINT message, WPARAM wParam, LPA
 
 void CustomWindow::CreateCustomWindow(HINSTANCE hInstance, int nCmdShow)
 {
-	RECT rectangle = { 0, 0, 800, 600 };
-	AdjustWindowRect(&rectangle, WS_OVERLAPPEDWINDOW, FALSE);
+	RECT rectangle = { 0, 0, 300, 300 };
+	auto windowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+	AdjustWindowRect(&rectangle, windowStyle, FALSE);
 	_windowHandle = CreateWindow(
-		L"TutorialWindowClass",
-		L"Direct3D 11 Tutorial 2: Rendering a Triangle",
-		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
-		//WS_OVERLAPPEDWINDOW,
+		windowClassName,
+		L"Test",
+		windowStyle,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		rectangle.right - rectangle.left,
 		rectangle.bottom - rectangle.top, nullptr, nullptr, hInstance,
