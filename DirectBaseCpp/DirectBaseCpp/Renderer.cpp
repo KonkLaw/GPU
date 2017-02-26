@@ -6,10 +6,8 @@ Renderer::Renderer(Size size, HWND windowHandle) : sampleDescription(DXGI_SAMPLE
 	InitRenderTargetAndDepthStencil(size);
 	InitViewPort(size);
 	InitShadersAndLayout();
-
-	_immediateContext->OMSetRenderTargets(1, &_renderTargetView, _depthStencilView);
-
 	CreateData();
+	_immediateContext->OMSetRenderTargets(1, &_renderTargetView, _depthStencilView);
 }
 
 void Renderer::InitDeviceContextSwapChain(Size size, HWND windowHandle)
@@ -85,7 +83,8 @@ void Renderer::InitRenderTargetAndDepthStencil(Size size)
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
 	ZeroMemory(&descDSV, sizeof(descDSV));
 	descDSV.Format = descDepth.Format;
-	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	descDSV.ViewDimension = sampleDescription.Count == 1 ?
+		D3D11_DSV_DIMENSION_TEXTURE2D : D3D11_DSV_DIMENSION_TEXTURE2DMS;
 	descDSV.Texture2D.MipSlice = 0;
 	CheckResult(
 		_device->CreateDepthStencilView(depthStencil, &descDSV, &_depthStencilView));
@@ -168,7 +167,14 @@ std::vector<XMFLOAT4>* CreatePoints();
 
 void Renderer::CreateData()
 {
-	points = CreatePoints();
+	//points = CreatePoints();
+	points = new std::vector<XMFLOAT4>();
+	//points->push_back(XMFLOAT4(-0.5, -0.5, 0, 1));
+	//points->push_back(XMFLOAT4(0, +0.5, 0, 1));
+	//points->push_back(XMFLOAT4(+0.5, -0.5, 0, 1));
+	points->push_back(XMFLOAT4(-1.1f, -1.1f, 0, 1.f));
+	points->push_back(XMFLOAT4(-1.1f, 1.f, 0, 1.f));
+	points->push_back(XMFLOAT4(1.f, -1.1f, 0, 1.f));
 
 	colors = new std::vector<XMFLOAT3>();
 	colors->reserve(points->size());
@@ -193,15 +199,11 @@ void Renderer::CreateData()
 	ZeroMemory(&data, sizeof(data));
 	data.pSysMem = points->data();
 
-	CheckResult(
-		_device->CreateBuffer(
-			&bufferDescr, &data, &_pointsBuffer));
+	CheckResult(_device->CreateBuffer(&bufferDescr, &data, &_pointsBuffer));
 
 	bufferDescr.ByteWidth = sizeof(XMFLOAT3) * colors->size();
 	data.pSysMem = colors->data();
-	CheckResult(
-		_device->CreateBuffer(
-			&bufferDescr, &data, &_colorsBuffer));
+	CheckResult(_device->CreateBuffer(&bufferDescr, &data, &_colorsBuffer));
 }
 
 void AddTraingles(std::vector<XMFLOAT4>* data,

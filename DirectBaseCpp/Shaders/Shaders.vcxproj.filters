@@ -3,6 +3,7 @@
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl" />
     <FxCompile Include="PixelShader.hlsl" />
+    <FxCompile Include="PixelShaderWithOutput.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Header.hlsli" />

@@ -19,15 +19,6 @@ class Renderer
 	const DXGI_SAMPLE_DESC sampleDescription;
 	const DXGI_FORMAT textureFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-	ID3D11Device*           _device = nullptr;
-	ID3D11DeviceContext*    _immediateContext = nullptr;
-	IDXGISwapChain*			_swapChain = nullptr;
-
-	ID3D11RenderTargetView* _renderTargetView = nullptr;
-	ID3D11DepthStencilView* _depthStencilView = nullptr;
-
-	ID3D11VertexShader*     _vertexShader = nullptr;
-	ID3D11PixelShader*      _pixelShader = nullptr;
 	ID3D11InputLayout*      _vertexLayout = nullptr;
 	ID3D11Buffer*           _pointsBuffer = nullptr;
 	ID3D11Buffer*           _colorsBuffer = nullptr;
@@ -44,11 +35,23 @@ class Renderer
 	void CreateData();
 
 	const float BackgoundColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; //red, green, blue, alpha
+
+protected:
+	ID3D11Device*           _device = nullptr;
+	ID3D11DeviceContext*    _immediateContext = nullptr;
+	IDXGISwapChain*			_swapChain = nullptr;
+
+	ID3D11RenderTargetView* _renderTargetView = nullptr;
+	ID3D11DepthStencilView* _depthStencilView = nullptr;
+
+	ID3D11VertexShader*     _vertexShader = nullptr;
+	ID3D11PixelShader*      _pixelShader = nullptr;
+
 public:
 	Renderer(Size size, HWND windowHandle);
-	void Render();
+	virtual void Render();
 
-	Renderer::~Renderer()
+	virtual ~Renderer()
 	{
 		//_immediateContext->OMSetRenderTargets(1, nullptr, nullptr); // remove pointer to renderTarget and depthSenticil
 		_device->Release();

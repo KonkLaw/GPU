@@ -44,6 +44,9 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RendererDebugPixel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DirectBaseCpp.rc">
@@ -55,6 +58,9 @@
       <Filter>CompiledShaders</Filter>
     </None>
     <None Include="CompiledShaders\VertexShader.cso">
+      <Filter>CompiledShaders</Filter>
+    </None>
+    <None Include="CompiledShaders\PixelShaderWithOutput.cso">
       <Filter>CompiledShaders</Filter>
     </None>
   </ItemGroup>

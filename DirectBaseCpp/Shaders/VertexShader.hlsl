@@ -3,7 +3,7 @@
 Vertex main(float4 Pos : POSITION, float3 Col : COLOR)
 {
 	Vertex v = (Vertex)0;
-	v.pos = Pos;
-	v.col = Col;
+	v.position = Pos;
+	v.color = Col;
 	return v;
 }

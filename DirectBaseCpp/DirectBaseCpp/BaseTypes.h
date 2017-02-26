@@ -70,7 +70,9 @@ public:
 			res += _times[i];
 		}
 		res = res / TimesCount;
-		std::string text = std::string("AVG=") + std::to_string(res) + std::string(" FPS=") + std::to_string(1.0 / res);
+		std::string text =
+			std::string(" FPS=") + std::to_string(1.0 / res)
+			+ std::string("AVG=") + std::to_string(res);
 		return text;
 	}
 };

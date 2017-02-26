@@ -5,7 +5,9 @@ CustomWindow::CustomWindow(HINSTANCE hInstance, int nCmdShow)
 	_frameCounter = new FrameCounter();
 	RegisteWindow(hInstance);
 	CreateCustomWindow(hInstance, nCmdShow);
+
 	_renderer = new Renderer(GetSize(), _windowHandle);
+	//_renderer = new RendererDebugPixel(GetSize(), _windowHandle);
 }
 
 void CustomWindow::RegisteWindow(HINSTANCE hInstance)
@@ -56,7 +58,7 @@ LRESULT CustomWindow::EventProcessor(HWND hWnd, UINT message, WPARAM wParam, LPA
 
 void CustomWindow::CreateCustomWindow(HINSTANCE hInstance, int nCmdShow)
 {
-	RECT rectangle = { 0, 0, 300, 300 };
+	RECT rectangle = { 0, 0, 200, 200 };
 	auto windowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 	AdjustWindowRect(&rectangle, windowStyle, FALSE);
 	_windowHandle = CreateWindow(

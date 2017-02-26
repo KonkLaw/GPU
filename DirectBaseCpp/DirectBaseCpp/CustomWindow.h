@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include "Renderer.h"
+#include "RendererDebugPixel.h"
 #include "BaseTypes.h"
 
 class CustomWindow
