@@ -6,12 +6,9 @@ namespace DirectXBaseCSharp
 {
     public partial class MainForm : Form
     {
-        private Renderer renderer;
-
         public MainForm()
         {
             InitializeComponent();
-            renderer = new Renderer(renderControl);
         }
 
         private void buttonRunTest_Click(object sender, System.EventArgs e)
@@ -19,7 +16,7 @@ namespace DirectXBaseCSharp
             Text = "!!! TEST ON RUN !!!";
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            renderer.RenderFrame();
+			renderControl.RequestRender();
 
             const int count = 1000;
             Stopwatch stopwatch = new Stopwatch();
@@ -27,7 +24,7 @@ namespace DirectXBaseCSharp
 
             for (int i = 0; i < count; i++)
             {
-                renderer.RenderFrame();
+				renderControl.RequestRender();
             }
 
             stopwatch.Stop();

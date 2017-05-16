@@ -2,6 +2,7 @@
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
+using System.Drawing;
 using System;
 
 using Device = SharpDX.Direct3D11.Device;
@@ -15,9 +16,10 @@ namespace DirectXBaseCSharp
         private readonly SampleDescription sampleDescription = new SampleDescription(1, 0);
         private readonly RawColor4 backColor = new RawColor4(1, 1, 1, 1);
 
-        private readonly IRenderControl renderControl;
+		private readonly Size Size;
+		private readonly IntPtr Handle;
 
-        private Device device;
+		private Device device;
         private DeviceContext context;
         private SwapChain swapChain;
 
@@ -33,14 +35,14 @@ namespace DirectXBaseCSharp
         private VertexBufferBinding colorsBufferBinding;
         private int pointsCount;
 
-        public Renderer(IRenderControl renderControl)
-        {
-            this.renderControl = renderControl;
-            InitDirectX();
-            renderControl.Render += RenderFrame;
-        }
+		public Renderer(WinFormsArgs winFormsArgs)
+		{
+			Size = winFormsArgs.Size;
+			Handle = winFormsArgs.ControlHandle;
+			InitDirectX();
+		}
 
-        private void InitDirectX()
+		private void InitDirectX()
         {
             InitDeviceAndContext();
             InitSwapChain();
@@ -80,11 +82,11 @@ namespace DirectXBaseCSharp
                 {
                     BufferCount = 1,
                     ModeDescription = new ModeDescription(
-                        renderControl.Width, renderControl.Height,
+						Size.Width, Size.Height,
                         new Rational(60, 1),
                         textureFormat),
                     IsWindowed = true,
-                    OutputHandle = renderControl.Handle,
+                    OutputHandle = Handle,
                     SampleDescription = sampleDescription,
                     SwapEffect = SwapEffect.Discard,
                     Usage = Usage.RenderTargetOutput
@@ -103,8 +105,8 @@ namespace DirectXBaseCSharp
             {
                 BindFlags = BindFlags.DepthStencil,
                 Format = Format.D32_Float,
-                Width = renderControl.Width,
-                Height = renderControl.Width,
+                Width = Size.Width,
+                Height = Size.Width,
                 MipLevels = 1,
                 SampleDescription = sampleDescription,
                 Usage = ResourceUsage.Default,
@@ -122,8 +124,8 @@ namespace DirectXBaseCSharp
         {
             viewPort = new RawViewportF
             {
-                Width = renderControl.Width,
-                Height = renderControl.Height,
+                Width = Size.Width,
+                Height = Size.Height,
                 X = 0, 
                 Y = 0,
                 MinDepth = 0,
@@ -176,7 +178,6 @@ namespace DirectXBaseCSharp
 
         public void Dispose()
         {
-            renderControl.Render -= RenderFrame;
             device.Dispose();
             context.Dispose();
             swapChain.Dispose();
