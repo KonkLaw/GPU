@@ -90,7 +90,7 @@ namespace DirectXBaseCSharp
             }
         }
 
-        internal static RawVector3[] CreateColors(int length)
+        internal static RawVector3[] CreateTriangleColors(int length)
         {
             var colors = new RawVector3[length];
             var randomHelper = new RandomFloatHelper();
@@ -106,24 +106,47 @@ namespace DirectXBaseCSharp
             }
             return colors;
         }
-    }
+
+		internal static RawVector3[] CreateColors(int length)
+		{
+			var colors = new RawVector3[length];
+			var randomHelper = new RandomFloatHelper();
+			for (int i = 0; i < colors.Length;)
+			{
+				float randR = randomHelper.GetNext(0f, 1f);
+				float randG = randomHelper.GetNext(0f, 1f);
+				float randB = randomHelper.GetNext(0f, 1f);
+				var color = new RawVector3(randR, randG, randB);
+				colors[i++] = color;
+			}
+			return colors;
+		}
+	}
 
     class RandomFloatHelper
     {
         private readonly byte[] randomBytes = new byte[sizeof(float)];
-        private static readonly Random random = new Random(DateTime.Now.Millisecond);
+        private static readonly Random Random = new Random(DateTime.Now.Millisecond);
 
         public float GetNext()
         {
-            random.NextBytes(randomBytes);
+            Random.NextBytes(randomBytes);
             return BitConverter.ToSingle(randomBytes, 0);
         }
 
-        public float GetNext(float begin, float end)
-        {
-            //float randomValue = GetNext();
-            //return (float)( ((((double)randomValue - (double)float.MinValue))/ 2.0) / (double)float.MaxValue * 2.0);
-            return (float)random.Next(0, 255) / 255f;
-        }
+        public float GetNext(float begin, float end) => Convert.ToSingle(begin + Random.NextDouble() * (end - begin));
+
+	    public RawVector4 GenInCube(float beginX, float endX, float beginY, float endY)
+			=> new RawVector4(GetNext(beginX, endX), GetNext(beginY, endY), GetNext(0, 1), 1);
+
+	    public RawVector4[] GenInCube(float beginX, float endX, float beginY, float endY, int count)
+	    {
+			var result = new RawVector4[count];
+		    for (int i = 0; i < result.Length; i++)
+		    {
+			    result[i] = GenInCube(beginX, endX, beginY, endY);
+		    }
+		    return result;
+	    }
     }
 }

@@ -11,7 +11,7 @@ namespace DirectXBaseCSharp
         public MainForm()
         {
             InitializeComponent();
-	        info = Environment.Is64BitProcess ? "x64" : "x86";
+	        info = Environment.Is64BitProcess ? "x64" : "x86" + "  " + (Debugger.IsAttached ? "Debugger Attached" : "");
 	        base.Text = info;
         }
 

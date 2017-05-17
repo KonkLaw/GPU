@@ -151,7 +151,10 @@ namespace DirectXBaseCSharp
 
         private void InitDrawingData()
         {
-			RawVector4[] points = Helper.CreatePoints().ToArray();
+			RawVector4[] points = new RandomFloatHelper().GenInCube(-1f, 1f, -1f, 1f, 1000000);
+
+			//RawVector4[] points = Helper.CreatePoints().ToArray();
+			
 			//RawVector4[] points = new RawVector4[]
 			//{
 			//	new RawVector4(-0.65f, -0.5f, 0.6f, 1f),
@@ -163,6 +166,7 @@ namespace DirectXBaseCSharp
 			//	new RawVector4(+0.6f, -0.5f, 0.7f, 1f),
 			//};
 
+			//RawVector3[] colors = Helper.CreateTriangleColors(points.Length);
 			RawVector3[] colors = Helper.CreateColors(points.Length);
 
 			//RawVector2[] textCoord = new []
@@ -209,9 +213,10 @@ namespace DirectXBaseCSharp
             context.ClearDepthStencilView(depthStencilView, DepthStencilClearFlags.Depth, 1f, 0);
             // IA.
             context.InputAssembler.InputLayout = pos4Col3Layout;
-            context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-            // Data.
-            context.InputAssembler.SetVertexBuffers(0, positionsBufferBinding);
+			//context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
+			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.PointList;
+			// Data.
+			context.InputAssembler.SetVertexBuffers(0, positionsBufferBinding);
             context.InputAssembler.SetVertexBuffers(1, colorsBufferBinding);
 			//context.InputAssembler.SetVertexBuffers(2, textCoordBufferBinding);
 			//context.PixelShader.SetShaderResource(0, shaderResource);

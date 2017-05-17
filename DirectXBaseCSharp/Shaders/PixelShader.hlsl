@@ -12,7 +12,8 @@
 
 float4 main(Vertex vertex) : SV_Target
 {
-	return float4(ver.col,1);
+	//clip(400 - vertex.position.x);
+	return float4(vertex.color, 1);
 	//float3 color = text.Sample(clampSampler, vertex.textCoord);
 	//double cos1 = 0;
 	//double sin1 = 0;
