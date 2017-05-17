@@ -6,9 +6,13 @@ namespace DirectXBaseCSharp
 {
     public partial class MainForm : Form
     {
+	    private readonly string info;
+
         public MainForm()
         {
             InitializeComponent();
+	        info = Environment.Is64BitProcess ? "x64" : "x86";
+	        base.Text = info;
         }
 
         private void buttonRunTest_Click(object sender, System.EventArgs e)
@@ -29,7 +33,7 @@ namespace DirectXBaseCSharp
 
             stopwatch.Stop();
 
-            Text = "MainWindow";
+            Text = info;
             MessageBox.Show("FPS: " + 
                 Math.Round(
                     count / (stopwatch.ElapsedMilliseconds / TimeSpan.FromSeconds(1).TotalMilliseconds))

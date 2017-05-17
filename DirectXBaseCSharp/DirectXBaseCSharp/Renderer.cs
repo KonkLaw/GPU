@@ -16,8 +16,8 @@ namespace DirectXBaseCSharp
         private readonly SampleDescription sampleDescription = new SampleDescription(1, 0);
         private readonly RawColor4 backColor = new RawColor4(1, 1, 1, 1);
 
-		private readonly Size Size;
-		private readonly IntPtr Handle;
+		private readonly Size size;
+		private readonly IntPtr handle;
 
 		private Device device;
         private DeviceContext context;
@@ -31,14 +31,17 @@ namespace DirectXBaseCSharp
         private PixelShader pixelShader;
         private InputLayout pos4Col3Layout;
 
-        private VertexBufferBinding positionsBufferBinding;
-        private VertexBufferBinding colorsBufferBinding;
-        private int pointsCount;
+		private int pointsCount;
 
-		public Renderer(WinFormsArgs winFormsArgs)
+		private VertexBufferBinding positionsBufferBinding;
+        private VertexBufferBinding colorsBufferBinding;
+		//private VertexBufferBinding textCoordBufferBinding;
+	    //private ShaderResourceView shaderResource;
+
+	    public Renderer(WinFormsArgs winFormsArgs)
 		{
-			Size = winFormsArgs.Size;
-			Handle = winFormsArgs.ControlHandle;
+			size = winFormsArgs.Size;
+			handle = winFormsArgs.ControlHandle;
 			InitDirectX();
 		}
 
@@ -82,11 +85,11 @@ namespace DirectXBaseCSharp
                 {
                     BufferCount = 1,
                     ModeDescription = new ModeDescription(
-						Size.Width, Size.Height,
+						size.Width, size.Height,
                         new Rational(60, 1),
                         textureFormat),
                     IsWindowed = true,
-                    OutputHandle = Handle,
+                    OutputHandle = handle,
                     SampleDescription = sampleDescription,
                     SwapEffect = SwapEffect.Discard,
                     Usage = Usage.RenderTargetOutput
@@ -105,8 +108,8 @@ namespace DirectXBaseCSharp
             {
                 BindFlags = BindFlags.DepthStencil,
                 Format = Format.D32_Float,
-                Width = Size.Width,
-                Height = Size.Width,
+                Width = size.Width,
+                Height = size.Width,
                 MipLevels = 1,
                 SampleDescription = sampleDescription,
                 Usage = ResourceUsage.Default,
@@ -124,8 +127,8 @@ namespace DirectXBaseCSharp
         {
             viewPort = new RawViewportF
             {
-                Width = Size.Width,
-                Height = Size.Height,
+                Width = size.Width,
+                Height = size.Height,
                 X = 0, 
                 Y = 0,
                 MinDepth = 0,
@@ -142,18 +145,60 @@ namespace DirectXBaseCSharp
                 {
                     new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
                     new InputElement("COLOR", 0, Format.R32G32B32_Float, 0, 1),
-                });
+					//new InputElement("TEXTCOORD", 0, Format.R32G32_Float, 0, 2),
+				});
         }
 
         private void InitDrawingData()
         {
-            RawVector4[] points = Helper.CreatePoints().ToArray();
-            Buffer pointsBuffer = Buffer.Create(device, BindFlags.VertexBuffer, points);
+			RawVector4[] points = Helper.CreatePoints().ToArray();
+			//RawVector4[] points = new RawVector4[]
+			//{
+			//	new RawVector4(-0.65f, -0.5f, 0.6f, 1f),
+			//	new RawVector4(+0.00f, +0.8f, 0.6f, 1f),
+			//	new RawVector4(+0.65f, -0.5f, 0.6f, 1f),
+			//
+			//	new RawVector4(-0.6f, -0.5f, 0.7f, 1f),
+			//	new RawVector4(+0.0f, +0.8f, 0.7f, 1f),
+			//	new RawVector4(+0.6f, -0.5f, 0.7f, 1f),
+			//};
+
+			RawVector3[] colors = Helper.CreateColors(points.Length);
+
+			//RawVector2[] textCoord = new []
+			//{
+			//	new RawVector2(0.0f, 0.0f),
+			//	new RawVector2(1.0f, 0.0f),
+			//	new RawVector2(0.0f, 1.0f),
+			//
+			//	new RawVector2(0.0f, 0.0f),
+			//	new RawVector2(1.0f, 0.0f),
+			//	new RawVector2(0.0f, 1.0f),
+			//};
+
+			pointsCount = points.Length;
+
+			Buffer pointsBuffer = Buffer.Create(device, BindFlags.VertexBuffer, points);
             positionsBufferBinding = new VertexBufferBinding(pointsBuffer, 16, 0);
-            RawVector3[] colors = Helper.CreateColors(points.Length);
+
             Buffer colorsBuffer = Buffer.Create(device, BindFlags.VertexBuffer, colors);
             colorsBufferBinding = new VertexBufferBinding(colorsBuffer, 12, 0);
-            pointsCount = points.Length;
+
+			//Buffer textCoordBuffer = Buffer.Create(device, BindFlags.VertexBuffer, textCoord);
+			//textCoordBufferBinding = new VertexBufferBinding(textCoordBuffer, 8, 0);
+	        //var texture2D = new Texture2D(device, new Texture2DDescription
+	        //{
+		    //    ArraySize = 1,
+		    //    BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource,
+		    //    CpuAccessFlags = CpuAccessFlags.None,
+		    //    Format = Format.B8G8R8A8_UNorm,
+		    //    Width = 400,
+		    //    Height = 400,
+		    //    MipLevels = 1,
+		    //    SampleDescription = new SampleDescription(1, 0),
+		    //    Usage = ResourceUsage.Default,
+	        //});
+			//shaderResource = new ShaderResourceView(device, texture2D);
         }
 
         public void RenderFrame()
@@ -168,8 +213,10 @@ namespace DirectXBaseCSharp
             // Data.
             context.InputAssembler.SetVertexBuffers(0, positionsBufferBinding);
             context.InputAssembler.SetVertexBuffers(1, colorsBufferBinding);
-            // Draw.
-            context.VertexShader.Set(vertexShader);
+			//context.InputAssembler.SetVertexBuffers(2, textCoordBufferBinding);
+			//context.PixelShader.SetShaderResource(0, shaderResource);
+			// Draw.
+			context.VertexShader.Set(vertexShader);
             context.PixelShader.Set(pixelShader);
             context.Draw(pointsCount, 0);
 
@@ -192,6 +239,8 @@ namespace DirectXBaseCSharp
             positionsBufferBinding.Buffer.Dispose();
             colorsBufferBinding.Buffer.Dispose();
             colorsBufferBinding.Buffer.Dispose();
-        }
+			//textCoordBufferBinding.Buffer.Dispose();
+			//shaderResource.Dispose();
+		}
     }
 }

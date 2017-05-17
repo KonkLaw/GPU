@@ -1,9 +1,10 @@
 #include "Header.hlsli"
 
-Vertex main(float4 Pos : POSITION, float3 Col : COLOR)
+Vertex main(float4 position : POSITION, float3 color : COLOR, float2 textCoord : TEXTCOORD)
 {
-	Vertex v = (Vertex)0;
-	v.pos = Pos;
-	v.col = Col;
-	return v;
+	Vertex vertex = (Vertex)0;
+	vertex.position = position;
+	vertex.color = color;
+	//vertex.textCoord = textCoord;
+	return vertex;
 }
