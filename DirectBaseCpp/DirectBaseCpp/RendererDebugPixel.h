@@ -7,12 +7,16 @@ public:
 	float x;
 	float y;
 	unsigned int coverage;
+	unsigned int sampleIndex;
+	float tx;
+	float ty;
 
 	static PixelInfo GetDefault()
 	{
 		PixelInfo newOne = PixelInfo();
 		newOne.x = -999;
 		newOne.y = -999;
+		newOne.coverage = 999;
 		newOne.coverage = 999;
 		return newOne;
 	}
@@ -53,9 +57,9 @@ public:
 
 	void InitUAV(Size size)
 	{
-		pixelsCount = size.Height * size.Width * 1;
-		pixelsCount = (int)(1.1f * (float)pixelsCount);
+		pixelsCount = Renderer::sampleDescription.Count * (size.Height * size.Width);
 
+		// buffer for data
 		D3D11_BUFFER_DESC buffDesc;
 		ZeroMemory(&buffDesc, sizeof(buffDesc));
 		buffDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
@@ -64,14 +68,17 @@ public:
 		buffDesc.StructureByteStride = sizeof(PixelInfo);
 		buffDesc.Usage = D3D11_USAGE_DEFAULT;
 
+		// array for buffer
 		PixelInfo* emptyArray = new PixelInfo[pixelsCount];
 		for (size_t i = 0; i < pixelsCount; i++)
 			emptyArray[i] = PixelInfo::GetDefault();
 		D3D11_SUBRESOURCE_DATA data;
 		ZeroMemory(&data, sizeof(data));
 		data.pSysMem = emptyArray;
+
 		auto hr = _device->CreateBuffer(&buffDesc, &data, &_buffer);
 
+		// UAV
 		D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
 		ZeroMemory(&uavDesc, sizeof(uavDesc));
 		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -122,9 +129,12 @@ public:
 					<< "x=" << info.x
 					<< " y=" << info.y
 					<< " cov=" << info.coverage
-					<< "\n";
-				if (info.coverage != 1 && info.coverage != 999)
-					int y = 1;
+					<< " si=" << info.sampleIndex
+					<< " textX=" << info.tx
+					<< " textY=" << info.ty
+					<< endl;
+				//if (info.coverage != 1 && info.coverage != 999)
+				//	int y = 1;
 			}
 
 			myfile.close();

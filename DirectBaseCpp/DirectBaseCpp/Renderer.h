@@ -16,7 +16,6 @@ struct SimpleVertex
 
 class Renderer
 {
-	const DXGI_SAMPLE_DESC sampleDescription;
 	const DXGI_FORMAT textureFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 	ID3D11InputLayout*      _vertexLayout = nullptr;
@@ -37,6 +36,8 @@ class Renderer
 	const float BackgoundColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; //red, green, blue, alpha
 
 protected:
+	const DXGI_SAMPLE_DESC sampleDescription;
+
 	ID3D11Device*           _device = nullptr;
 	ID3D11DeviceContext*    _immediateContext = nullptr;
 	IDXGISwapChain*			_swapChain = nullptr;

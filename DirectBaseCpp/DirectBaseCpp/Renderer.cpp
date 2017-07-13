@@ -1,6 +1,6 @@
 #include "Renderer.h"
 
-Renderer::Renderer(Size size, HWND windowHandle) : sampleDescription(DXGI_SAMPLE_DESC{ 1, 0 })
+Renderer::Renderer(Size size, HWND windowHandle) : sampleDescription(DXGI_SAMPLE_DESC{ 8, 8 })
 {
 	InitDeviceContextSwapChain(size, windowHandle);
 	InitRenderTargetAndDepthStencil(size);
@@ -172,9 +172,9 @@ void Renderer::CreateData()
 	//points->push_back(XMFLOAT4(-0.5, -0.5, 0, 1));
 	//points->push_back(XMFLOAT4(0, +0.5, 0, 1));
 	//points->push_back(XMFLOAT4(+0.5, -0.5, 0, 1));
-	points->push_back(XMFLOAT4(-1.1f, -1.1f, 0, 1.f));
-	points->push_back(XMFLOAT4(-1.1f, 1.f, 0, 1.f));
-	points->push_back(XMFLOAT4(1.f, -1.1f, 0, 1.f));
+	points->push_back(XMFLOAT4(-1.0f, -1.0f, 0, 1.f));
+	points->push_back(XMFLOAT4(-1.0f, +1.0f, 0, 1.f));
+	points->push_back(XMFLOAT4(+1.0f, -1.0f, 0, 1.f));
 
 	colors = new std::vector<XMFLOAT3>();
 	colors->reserve(points->size());

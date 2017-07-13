@@ -6,8 +6,8 @@ CustomWindow::CustomWindow(HINSTANCE hInstance, int nCmdShow)
 	RegisteWindow(hInstance);
 	CreateCustomWindow(hInstance, nCmdShow);
 
-	_renderer = new Renderer(GetSize(), _windowHandle);
-	//_renderer = new RendererDebugPixel(GetSize(), _windowHandle);
+	//_renderer = new Renderer(GetSize(), _windowHandle);
+	_renderer = new RendererDebugPixel(GetSize(), _windowHandle);
 }
 
 void CustomWindow::RegisteWindow(HINSTANCE hInstance)
