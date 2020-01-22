@@ -4,13 +4,12 @@ using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
 using System.Drawing;
 using System;
-
+using DirectXBaseCSharp.Scenes;
 using Device = SharpDX.Direct3D11.Device;
-using Buffer = SharpDX.Direct3D11.Buffer;
 
 namespace DirectXBaseCSharp
 {
-    class Renderer : IDisposable
+	class Renderer : IDisposable
     {
         private static readonly Format textureFormat = Format.R8G8B8A8_UNorm;
         private readonly SampleDescription sampleDescription = new SampleDescription(1, 0);
@@ -27,34 +26,28 @@ namespace DirectXBaseCSharp
         private DepthStencilView depthStencilView;
         private RawViewportF viewPort;
 
-        private VertexShader vertexShader;
-        private PixelShader pixelShader;
-        private InputLayout pos4Col3Layout;
-
-		private int pointsCount;
-
-		private VertexBufferBinding positionsBufferBinding;
-        private VertexBufferBinding colorsBufferBinding;
-		//private VertexBufferBinding textCoordBufferBinding;
-	    //private ShaderResourceView shaderResource;
+        private readonly BaseScene scene;
 
 	    public Renderer(WinFormsArgs winFormsArgs)
 		{
 			size = winFormsArgs.Size;
 			handle = winFormsArgs.ControlHandle;
-			InitDirectX();
+
+			scene = new StencilTest();
+			Init();
 		}
 
-		private void InitDirectX()
+		private void Init()
         {
             InitDeviceAndContext();
             InitSwapChain();
             InitRenderTargetAndDepthStencil();
             InitViewPort();
-            InitShadersAndLayout();
-            InitDrawingData();
             context.OutputMerger.SetRenderTargets(depthStencilView, renderTargetView);
-        }
+
+            scene.InitShadersAndLayout(device);
+            scene.InitDrawingData(device);
+		}
 
         private void InitDeviceAndContext()
         {
@@ -73,28 +66,28 @@ namespace DirectXBaseCSharp
 
         private void InitSwapChain()
         {
-            SharpDX.DXGI.Device dxgiDevice;
-            Adapter adapret;
-            Factory factory;
-            using (new DisposableContainer(
-                dxgiDevice = device.QueryInterface<SharpDX.DXGI.Device>(),
-                adapret = dxgiDevice.GetParent<Adapter>(),
-                factory = adapret.GetParent<Factory>()))
-            {
-                swapChain = new SwapChain(factory, device, new SwapChainDescription
-                {
-                    BufferCount = 1,
-                    ModeDescription = new ModeDescription(
-						size.Width, size.Height,
-                        new Rational(60, 1),
-                        textureFormat),
-                    IsWindowed = true,
-                    OutputHandle = handle,
-                    SampleDescription = sampleDescription,
-                    SwapEffect = SwapEffect.Discard,
-                    Usage = Usage.RenderTargetOutput
-                });
-            }
+	        using (var dxgiDevice = device.QueryInterface<SharpDX.DXGI.Device>())
+	        {
+		        using (var adapter = dxgiDevice.GetParent<Adapter>())
+		        {
+			        using (var factory = adapter.GetParent<Factory>())
+			        {
+				        swapChain = new SwapChain(factory, device, new SwapChainDescription
+				        {
+					        BufferCount = 1,
+					        ModeDescription = new ModeDescription(
+						        size.Width, size.Height,
+						        new Rational(60, 1),
+						        textureFormat),
+					        IsWindowed = true,
+					        OutputHandle = handle,
+					        SampleDescription = sampleDescription,
+					        SwapEffect = SwapEffect.Discard,
+					        Usage = Usage.RenderTargetOutput
+				        });
+			        }
+		        }
+	        }
         }
 
         private void InitRenderTargetAndDepthStencil()
@@ -104,23 +97,26 @@ namespace DirectXBaseCSharp
                 renderTargetView = new RenderTargetView(device, backBuffer);
             }
 
-            var depthЕextureDescription = new Texture2DDescription
+            if (!scene.TryGetCustomDepthStencilView(device, sampleDescription, size, out depthStencilView))
             {
-                BindFlags = BindFlags.DepthStencil,
-                Format = Format.D32_Float,
-                Width = size.Width,
-                Height = size.Width,
-                MipLevels = 1,
-                SampleDescription = sampleDescription,
-                Usage = ResourceUsage.Default,
-                OptionFlags = ResourceOptionFlags.None,
-                CpuAccessFlags = CpuAccessFlags.None,
-                ArraySize = 1,
-            };
-            using (var depthTexture = new Texture2D(device, depthЕextureDescription))
-            {
-                depthStencilView = new DepthStencilView(device, depthTexture);
-            }
+	            var depthTextureDescription = new Texture2DDescription
+	            {
+		            BindFlags = BindFlags.DepthStencil,
+		            Format = Format.D32_Float,
+		            Width = size.Width,
+		            Height = size.Width,
+		            MipLevels = 1,
+		            SampleDescription = sampleDescription,
+		            Usage = ResourceUsage.Default,
+		            OptionFlags = ResourceOptionFlags.None,
+		            CpuAccessFlags = CpuAccessFlags.None,
+		            ArraySize = 1
+	            };
+	            using (var depthTexture = new Texture2D(device, depthTextureDescription))
+	            {
+		            depthStencilView = new DepthStencilView(device, depthTexture);
+	            }
+			}
         }
 
         private void InitViewPort()
@@ -136,95 +132,20 @@ namespace DirectXBaseCSharp
             };
         }
 
-        private void InitShadersAndLayout()
-        {
-            byte[] signature = Helper.GetShaderByteCode("VertexShader");
-            vertexShader = new VertexShader(device, signature);
-            pixelShader = new PixelShader(device, Helper.GetShaderByteCode("PixelShader"));
-            pos4Col3Layout = new InputLayout(device, signature, new[]
-                {
-                    new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
-                    new InputElement("COLOR", 0, Format.R32G32B32_Float, 0, 1),
-					//new InputElement("TEXTCOORD", 0, Format.R32G32_Float, 0, 2),
-				});
-        }
-
-        private void InitDrawingData()
-        {
-			RawVector4[] points = new RandomFloatHelper().GenInCube(-1f, 1f, -1f, 1f, 1000000);
-
-			//RawVector4[] points = Helper.CreatePoints().ToArray();
-			
-			//RawVector4[] points = new RawVector4[]
-			//{
-			//	new RawVector4(-0.65f, -0.5f, 0.6f, 1f),
-			//	new RawVector4(+0.00f, +0.8f, 0.6f, 1f),
-			//	new RawVector4(+0.65f, -0.5f, 0.6f, 1f),
-			//
-			//	new RawVector4(-0.6f, -0.5f, 0.7f, 1f),
-			//	new RawVector4(+0.0f, +0.8f, 0.7f, 1f),
-			//	new RawVector4(+0.6f, -0.5f, 0.7f, 1f),
-			//};
-
-			//RawVector3[] colors = Helper.CreateTriangleColors(points.Length);
-			RawVector3[] colors = Helper.CreateColors(points.Length);
-
-			//RawVector2[] textCoord = new []
-			//{
-			//	new RawVector2(0.0f, 0.0f),
-			//	new RawVector2(1.0f, 0.0f),
-			//	new RawVector2(0.0f, 1.0f),
-			//
-			//	new RawVector2(0.0f, 0.0f),
-			//	new RawVector2(1.0f, 0.0f),
-			//	new RawVector2(0.0f, 1.0f),
-			//};
-
-			pointsCount = points.Length;
-
-			Buffer pointsBuffer = Buffer.Create(device, BindFlags.VertexBuffer, points);
-            positionsBufferBinding = new VertexBufferBinding(pointsBuffer, 16, 0);
-
-            Buffer colorsBuffer = Buffer.Create(device, BindFlags.VertexBuffer, colors);
-            colorsBufferBinding = new VertexBufferBinding(colorsBuffer, 12, 0);
-
-			//Buffer textCoordBuffer = Buffer.Create(device, BindFlags.VertexBuffer, textCoord);
-			//textCoordBufferBinding = new VertexBufferBinding(textCoordBuffer, 8, 0);
-	        //var texture2D = new Texture2D(device, new Texture2DDescription
-	        //{
-		    //    ArraySize = 1,
-		    //    BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource,
-		    //    CpuAccessFlags = CpuAccessFlags.None,
-		    //    Format = Format.B8G8R8A8_UNorm,
-		    //    Width = 400,
-		    //    Height = 400,
-		    //    MipLevels = 1,
-		    //    SampleDescription = new SampleDescription(1, 0),
-		    //    Usage = ResourceUsage.Default,
-	        //});
-			//shaderResource = new ShaderResourceView(device, texture2D);
-        }
-
         public void RenderFrame()
         {
-            // View.
-            context.Rasterizer.SetViewport(viewPort);
-            context.ClearRenderTargetView(renderTargetView, backColor);
-            context.ClearDepthStencilView(depthStencilView, DepthStencilClearFlags.Depth, 1f, 0);
-            // IA.
-            context.InputAssembler.InputLayout = pos4Col3Layout;
-			//context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.PointList;
-			// Data.
-			context.InputAssembler.SetVertexBuffers(0, positionsBufferBinding);
-            context.InputAssembler.SetVertexBuffers(1, colorsBufferBinding);
-			//context.InputAssembler.SetVertexBuffers(2, textCoordBufferBinding);
-			//context.PixelShader.SetShaderResource(0, shaderResource);
-			// Draw.
-			context.VertexShader.Set(vertexShader);
-            context.PixelShader.Set(pixelShader);
-            context.Draw(pointsCount, 0);
-
+			// Base view setup.
+	        context.Rasterizer.SetViewport(viewPort);
+	        context.ClearRenderTargetView(renderTargetView, backColor);
+	        if (scene.PreDrawHandler == null)
+				context.ClearDepthStencilView(depthStencilView, DepthStencilClearFlags.Depth, 1f, 0);
+	        else
+	        {
+				scene.PreDrawHandler.PreDraw(context, depthStencilView);
+			}
+			// Custom render.
+			scene.Render(context);
+			// Present.
             swapChain.Present(0, PresentFlags.None);
         }
 
@@ -238,14 +159,7 @@ namespace DirectXBaseCSharp
             renderTargetView.Dispose();
             depthStencilView.Dispose();
 
-            vertexShader.Dispose();
-            pixelShader.Dispose();
-            pos4Col3Layout.Dispose();
-            positionsBufferBinding.Buffer.Dispose();
-            colorsBufferBinding.Buffer.Dispose();
-            colorsBufferBinding.Buffer.Dispose();
-			//textCoordBufferBinding.Buffer.Dispose();
-			//shaderResource.Dispose();
+            scene.Dispose();
 		}
     }
 }

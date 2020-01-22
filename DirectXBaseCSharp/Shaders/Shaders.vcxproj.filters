@@ -1,10 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <FxCompile Include="VertexShader.hlsl" />
-    <FxCompile Include="PixelShader.hlsl" />
+    <FxCompile Include="SimpleTriangleVS.hlsl">
+      <Filter>SimpleTriangle</Filter>
+    </FxCompile>
+    <FxCompile Include="SimpleTrianglePS.hlsl">
+      <Filter>SimpleTriangle</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Header.hlsli" />
+    <Filter Include="SimpleTriangle">
+      <UniqueIdentifier>{a4dba35c-6301-4e15-afa1-417d925e6676}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Draft">
+      <UniqueIdentifier>{34619748-885b-49df-9102-34d7bbef4d6a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Draft.hlsli">
+      <Filter>Draft</Filter>
+    </None>
+    <None Include="SimpleTriangleHeader.hlsli">
+      <Filter>SimpleTriangle</Filter>
+    </None>
   </ItemGroup>
 </Project>

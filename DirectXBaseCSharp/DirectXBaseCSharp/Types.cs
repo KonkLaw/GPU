@@ -6,31 +6,13 @@ using System.Reflection;
 
 namespace DirectXBaseCSharp
 {
-    public class DisposableContainer : IDisposable
-    {
-        private readonly IDisposable[] disposableData;
-
-        public DisposableContainer(params IDisposable[] disposableObjects)
-        {
-            disposableData = disposableObjects;
-        }
-
-        public void Dispose()
-        {
-            foreach (var disposable in disposableData)
-            {
-                disposable.Dispose();
-            }
-        }
-    }
-
     public static class Helper
     {
         public static byte[] GetShaderByteCode(string shaderName)
         {
-            Assembly assembley = Assembly.GetExecutingAssembly();
-            using (Stream manifestResourceStream = assembley.GetManifestResourceStream(
-                    $"{assembley.GetName().Name}.CompiledShaders.{shaderName}.cso"))
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            using (Stream manifestResourceStream = assembly.GetManifestResourceStream(
+                    $"{assembly.GetName().Name}.CompiledShaders.{shaderName}.cso"))
             {
                 if (manifestResourceStream != null)
                     return new BinaryReader(manifestResourceStream).ReadBytes((int)manifestResourceStream.Length);

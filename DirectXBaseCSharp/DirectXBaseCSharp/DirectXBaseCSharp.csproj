@@ -23,6 +23,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,6 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -92,6 +95,10 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Scenes\BaseScene.cs" />
+    <Compile Include="Scenes\DraftScene.cs" />
+    <Compile Include="Scenes\StencilTest.cs" />
+    <Compile Include="Scenes\SimpleTriangles.cs" />
     <Compile Include="Types.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -123,11 +130,11 @@
     <EmbeddedResource Include="RenderControl.resx">
       <DependentUpon>RenderControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\CompiledShaders\PixelShader.cso">
-      <Link>CompiledShaders\PixelShader.cso</Link>
+    <EmbeddedResource Include="..\CompiledShaders\SimpleTrianglePS.cso">
+      <Link>CompiledShaders\SimpleTrianglePS.cso</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\CompiledShaders\VertexShader.cso">
-      <Link>CompiledShaders\VertexShader.cso</Link>
+    <EmbeddedResource Include="..\CompiledShaders\SimpleTriangleVS.cso">
+      <Link>CompiledShaders\SimpleTriangleVS.cso</Link>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -143,6 +150,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
