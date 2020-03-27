@@ -253,3 +253,4 @@ paket-files/
 
 # Built shaders
 *.cso
+/DirectBaseCpp/DirectBaseCpp/result.txt

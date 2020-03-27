@@ -1,6 +1,7 @@
 #include "Renderer.h"
+#include "ResourceHelper.h"
 
-Renderer::Renderer(Size size, HWND windowHandle) : sampleDescription(DXGI_SAMPLE_DESC{ 8, 8 })
+Renderer::Renderer(Size size, HWND windowHandle) : sampleDescription(DXGI_SAMPLE_DESC{ 8, 0 })
 {
 	InitDeviceContextSwapChain(size, windowHandle);
 	InitRenderTargetAndDepthStencil(size);
@@ -169,12 +170,9 @@ void Renderer::CreateData()
 {
 	//points = CreatePoints();
 	points = new std::vector<XMFLOAT4>();
-	//points->push_back(XMFLOAT4(-0.5, -0.5, 0, 1));
-	//points->push_back(XMFLOAT4(0, +0.5, 0, 1));
-	//points->push_back(XMFLOAT4(+0.5, -0.5, 0, 1));
-	points->push_back(XMFLOAT4(-1.0f, -1.0f, 0, 1.f));
-	points->push_back(XMFLOAT4(-1.0f, +1.0f, 0, 1.f));
-	points->push_back(XMFLOAT4(+1.0f, -1.0f, 0, 1.f));
+	points->push_back(XMFLOAT4(-0.9f, -0.9f, 0, 1.0f));
+	points->push_back(XMFLOAT4(-0.9f, +0.9f, 0, 1.0f));
+	points->push_back(XMFLOAT4(+0.9f, -0.9f, 0, 1.0f));
 
 	colors = new std::vector<XMFLOAT3>();
 	colors->reserve(points->size());
@@ -187,23 +185,8 @@ void Renderer::CreateData()
 		colors->push_back(XMFLOAT3(randR, randG, randB));
 		colors->push_back(XMFLOAT3(randR, randG, randB));
 	}
-
-	D3D11_BUFFER_DESC bufferDescr;
-	ZeroMemory(&bufferDescr, sizeof(bufferDescr));
-	bufferDescr.Usage = D3D11_USAGE_DEFAULT;
-	bufferDescr.ByteWidth = sizeof(XMFLOAT4) * points->size();
-	bufferDescr.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bufferDescr.CPUAccessFlags = 0;
-
-	D3D11_SUBRESOURCE_DATA data;
-	ZeroMemory(&data, sizeof(data));
-	data.pSysMem = points->data();
-
-	CheckResult(_device->CreateBuffer(&bufferDescr, &data, &_pointsBuffer));
-
-	bufferDescr.ByteWidth = sizeof(XMFLOAT3) * colors->size();
-	data.pSysMem = colors->data();
-	CheckResult(_device->CreateBuffer(&bufferDescr, &data, &_colorsBuffer));
+	_pointsBuffer = ResourceHelper::CreateVertexBuffer(_device, points->size(), points->data());
+	_colorsBuffer = ResourceHelper::CreateVertexBuffer(_device, colors->size(), colors->data());
 }
 
 void AddTraingles(std::vector<XMFLOAT4>* data,

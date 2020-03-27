@@ -122,6 +122,7 @@
     <ClCompile Include="CustomWindow.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="ResourceHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseTypes.h" />
@@ -129,6 +130,7 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RendererDebugPixel.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ResourceHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DirectBaseCpp.rc" />
